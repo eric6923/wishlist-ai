@@ -3,7 +3,7 @@
 client_id = "f679b0298212fa4b9f5fe48556444ddb"
 name = "wishlist-ai"
 handle = "wishlist-ai"
-application_url = "https://environments-spas-tue-draws.trycloudflare.com"
+application_url = "https://satisfaction-submitting-research-improvement.trycloudflare.com"
 embedded = true
 
 [build]
@@ -24,14 +24,14 @@ scopes = "read_themes,write_app_proxy,write_customers,write_discounts,write_meta
 
 [auth]
 redirect_urls = [
-  "https://environments-spas-tue-draws.trycloudflare.com/auth/callback",
-  "https://environments-spas-tue-draws.trycloudflare.com/auth/shopify/callback",
-  "https://environments-spas-tue-draws.trycloudflare.com/api/auth/callback"
+  "https://satisfaction-submitting-research-improvement.trycloudflare.com/auth/callback",
+  "https://satisfaction-submitting-research-improvement.trycloudflare.com/auth/shopify/callback",
+  "https://satisfaction-submitting-research-improvement.trycloudflare.com/api/auth/callback"
 ]
 
 [app_proxy]
-url = "https://environments-spas-tue-draws.trycloudflare.com/app/discount"
-subpath = "discount"
+url = "https://satisfaction-submitting-research-improvement.trycloudflare.com/app/wishlist"
+subpath = "wishlist"
 prefix = "apps"
 
 [pos]

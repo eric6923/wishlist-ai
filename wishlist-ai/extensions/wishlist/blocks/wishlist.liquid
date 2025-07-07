@@ -1,0 +1,281 @@
+{% comment %}
+  Simple Wishlist Theme App Extension Block
+{% endcomment %}
+
+{%- liquid
+  assign product_id = product.id | default: block.settings.product_id
+  assign customer_id = customer.id | default: null
+  assign block_id = 'wishlist-block-' | append: block.id
+-%}
+
+<div 
+  id="{{ block_id }}" 
+  class="wishlist-block"
+  data-product-id="{{ product_id }}"
+  data-customer-id="{{ customer_id }}"
+  data-shop-domain="{{ shop.domain }}"
+  {{ block.shopify_attributes }}
+>
+  <button 
+    type="button" 
+    class="wishlist-btn"
+    data-wishlist-toggle
+    aria-label="Add to wishlist"
+  >
+    <svg class="wishlist-icon wishlist-empty" width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke="currentColor" stroke-width="2"/>
+    </svg>
+    <svg class="wishlist-icon wishlist-filled" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+    </svg>
+    <span class="wishlist-text">{{ block.settings.add_text | default: 'Add to Wishlist' }}</span>
+  </button>
+  
+  <div class="wishlist-message" data-wishlist-message style="display: none;"></div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  
+  function initWishlist() {
+    const wishlistBlocks = document.querySelectorAll('.wishlist-block:not([data-initialized])');
+    
+    wishlistBlocks.forEach(block => {
+      const button = block.querySelector('[data-wishlist-toggle]');
+      const message = block.querySelector('[data-wishlist-message]');
+      const productId = block.dataset.productId;
+      const customerId = block.dataset.customerId;
+      
+      if (!button || !productId) return;
+      
+      // Mark as initialized
+      block.setAttribute('data-initialized', 'true');
+      
+      // Check initial status
+      checkWishlistStatus(block, customerId, productId);
+      
+      // Handle click
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (!customerId) {
+          showMessage(message, 'Please log in to use wishlist', 'error');
+          return;
+        }
+        
+        toggleWishlist(block, customerId, productId);
+      });
+    });
+  }
+  
+  function toggleWishlist(block, customerId, productId) {
+    const button = block.querySelector('[data-wishlist-toggle]');
+    const message = block.querySelector('[data-wishlist-message]');
+    const isActive = button.classList.contains('active');
+    
+    button.disabled = true;
+    
+    const action = isActive ? 'remove' : 'add';
+    const url = `/apps/wishlist?action=${action}&customer_id=${customerId}&product_id=${productId}`;
+    
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        updateButtonState(button, !isActive);
+        const messageText = isActive ? 'Removed from wishlist' : 'Added to wishlist!';
+        showMessage(message, messageText, 'success');
+      } else {
+        showMessage(message, 'Something went wrong', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Wishlist error:', error);
+      showMessage(message, 'Something went wrong', 'error');
+    })
+    .finally(() => {
+      button.disabled = false;
+    });
+  }
+  
+  function checkWishlistStatus(block, customerId, productId) {
+    if (!customerId) return;
+    
+    const url = `/apps/wishlist?action=check&customer_id=${customerId}&product_id=${productId}`;
+    
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const button = block.querySelector('[data-wishlist-toggle]');
+        updateButtonState(button, data.inWishlist);
+      }
+    })
+    .catch(error => {
+      console.error('Wishlist check error:', error);
+    });
+  }
+  
+  function updateButtonState(button, isActive) {
+    button.classList.toggle('active', isActive);
+    const text = button.querySelector('.wishlist-text');
+    if (text) {
+      text.textContent = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
+    }
+  }
+  
+  function showMessage(messageEl, text, type) {
+    if (!messageEl) return;
+    
+    messageEl.textContent = text;
+    messageEl.className = `wishlist-message wishlist-message--${type}`;
+    messageEl.style.display = 'block';
+    
+    setTimeout(() => {
+      messageEl.style.display = 'none';
+    }, 3000);
+  }
+  
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWishlist);
+  } else {
+    initWishlist();
+  }
+  
+  // Re-initialize on section loads (for theme editor)
+  document.addEventListener('shopify:section:load', initWishlist);
+  
+})();
+</script>
+
+<script>
+  window.wishlistData = {
+    domain: "{{ shop.domain }}",
+    productId: "{{ product_id }}",
+    customerId: "{{ customer_id }}"
+  };
+</script>
+
+<!-- Load wishlist scripts -->
+<script src="{{ 'wishlist.js' | asset_url }}"></script>
+
+<style>
+  .wishlist-block {
+    display: inline-block;
+    position: relative;
+  }
+  
+  .wishlist-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid {{ block.settings.border_color | default: '#ddd' }};
+    padding: {{ block.settings.padding | default: '10px 16px' }};
+    border-radius: {{ block.settings.border_radius | default: '4px' }};
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: {{ block.settings.font_size | default: '14px' }};
+    color: {{ block.settings.text_color | default: '#000' }};
+  }
+  
+  .wishlist-btn:hover {
+    border-color: #333;
+  }
+  
+  .wishlist-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .wishlist-btn.active {
+    color: {{ block.settings.active_color | default: '#e74c3c' }};
+    border-color: {{ block.settings.active_color | default: '#e74c3c' }};
+  }
+  
+  .wishlist-btn.active .wishlist-empty {
+    display: none;
+  }
+  
+  .wishlist-btn.active .wishlist-filled {
+    display: block !important;
+  }
+  
+  .wishlist-message {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: {{ block.settings.message_bg_color | default: '#333' }};
+    color: {{ block.settings.message_text_color | default: '#fff' }};
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+    margin-top: 8px;
+  }
+  
+  .wishlist-message::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid {{ block.settings.message_bg_color | default: '#333' }};
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Wishlist",
+  "target": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "add_text",
+      "label": "Add to Wishlist Text",
+      "default": "Add to Wishlist"
+    },
+    {
+      "type": "text",
+      "id": "remove_text", 
+      "label": "Remove from Wishlist Text",
+      "default": "Remove from Wishlist"
+    },
+    {
+      "type": "header",
+      "content": "Styling"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border Color", 
+      "default": "#dddddd"
+    },
+    {
+      "type": "color",
+      "id": "active_color",
+      "label": "Active Color",
+      "default": "#e74c3c"
+    }
+  ]
+}
+{% endschema %}
