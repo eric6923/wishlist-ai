@@ -49,7 +49,8 @@ model Wishlist {
 model Conversion {
   id          Int   @id @default(autoincrement())
   wishlistId  Int   
-  orderId     String   
+  orderId     String[]
+  orderHistory     String[]   
   convertion_value  Int?
   convertedAt DateTime @default(now())
 

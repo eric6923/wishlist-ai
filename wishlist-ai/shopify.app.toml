@@ -3,7 +3,7 @@
 client_id = "f679b0298212fa4b9f5fe48556444ddb"
 name = "wishlist-ai"
 handle = "wishlist-ai"
-application_url = "https://satisfaction-submitting-research-improvement.trycloudflare.com"
+application_url = "https://width-someone-leader-owns.trycloudflare.com"
 embedded = true
 
 [build]
@@ -20,17 +20,17 @@ api_version = "2025-07"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "read_themes,write_app_proxy,write_customers,write_discounts,write_metaobject_definitions,write_metaobjects,write_products"
+scopes = "read_themes,write_app_proxy,write_customers,write_discounts,write_metaobject_definitions,write_metaobjects,write_products,read_orders,read_customers"
 
 [auth]
 redirect_urls = [
-  "https://satisfaction-submitting-research-improvement.trycloudflare.com/auth/callback",
-  "https://satisfaction-submitting-research-improvement.trycloudflare.com/auth/shopify/callback",
-  "https://satisfaction-submitting-research-improvement.trycloudflare.com/api/auth/callback"
+  "https://width-someone-leader-owns.trycloudflare.com/auth/callback",
+  "https://width-someone-leader-owns.trycloudflare.com/auth/shopify/callback",
+  "https://width-someone-leader-owns.trycloudflare.com/api/auth/callback"
 ]
 
 [app_proxy]
-url = "https://satisfaction-submitting-research-improvement.trycloudflare.com/app/wishlist"
+url = "https://width-someone-leader-owns.trycloudflare.com/app/wishlist"
 subpath = "wishlist"
 prefix = "apps"
 
