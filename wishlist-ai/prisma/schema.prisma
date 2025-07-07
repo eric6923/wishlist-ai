@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+}
+
+model Store {
+  shop                 String        @id @unique
+  accessToken          String
+  metaObjects          Json?
+  metaObjectDefinition Json?
+  ShopStatus           ShopStatus
+  Wishlist             Wishlist[]
+}
+
+model Wishlist {
+  id          Int   @id @default(autoincrement())
+  customerId  String?   
+  productId   String?   
+  
+  store      Store    @relation(fields: [storeId], references: [shop])
+  storeId   String
+  createdAt     DateTime @default(now())
+  
+  conversions Conversion[]
+}
+
+model Conversion {
+  id          Int   @id @default(autoincrement())
+  wishlistId  Int   
+  orderId     String   
+  convertion_value  Int?
+  convertedAt DateTime @default(now())
+
+  wishlist Wishlist @relation(fields: [wishlistId], references: [id])
+}
+
+enum ShopStatus{
+  INSTALLED
+  UNINSTALLED
+}

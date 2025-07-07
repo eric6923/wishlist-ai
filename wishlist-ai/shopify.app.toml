@@ -1,0 +1,38 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "f679b0298212fa4b9f5fe48556444ddb"
+name = "wishlist-ai"
+handle = "wishlist-ai"
+application_url = "https://nicholas-jackson-meal-greensboro.trycloudflare.com"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true
+
+[webhooks]
+api_version = "2025-07"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled", "shop/update" ]
+  uri = "/webhooks"
+  compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_themes,write_app_proxy,write_customers,write_discounts,write_metaobject_definitions,write_metaobjects,write_products"
+
+[auth]
+redirect_urls = [
+  "https://nicholas-jackson-meal-greensboro.trycloudflare.com/auth/callback",
+  "https://nicholas-jackson-meal-greensboro.trycloudflare.com/auth/shopify/callback",
+  "https://nicholas-jackson-meal-greensboro.trycloudflare.com/api/auth/callback"
+]
+
+[app_proxy]
+url = "https://nicholas-jackson-meal-greensboro.trycloudflare.com/app/discount"
+subpath = "discount"
+prefix = "apps"
+
+[pos]
+embedded = false
