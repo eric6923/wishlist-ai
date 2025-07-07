@@ -26,7 +26,7 @@ interface ThemeListResponse {
     };
   };
 }
-
+const popupData = "WishList"
 // GraphQL query to fetch theme files
 const THEME_LIST_QUERY = `query ThemeList($roles: [ThemeRole!], $filenames: [String!]!) {
   themes(first: 10, roles: $roles) {
@@ -104,9 +104,10 @@ export class MetaobjectService {
     }
   }
 
-  async createMetaObjectDefinition(request: any, popupData: any) {
+  async createMetaObjectDefinition(request: any) {
     const { admin } = await authenticate.admin(request);
 
+    const metaobjectType = `app_${process.env.APP_ID}_wishlist_1`;
     console.log("Entered into saveMetaobject ----> createMetaDefinition");
 
     const response = await admin.graphql(
@@ -132,8 +133,8 @@ export class MetaobjectService {
       {
         variables: {
           definition: {
-            name: "Test 3 Spin wheel popup App Owned New TEst",
-            type: `app--${process.env.APP_ID}--spin-wheel-840`,
+            name: "WishList AI Definition",
+            type: metaobjectType,
             fieldDefinitions: [
               {
                 name: "popup settings",
@@ -159,9 +160,9 @@ export class MetaobjectService {
     return data;
   }
 
-  async createMetaObject(request: any, popupData: any) {
+  async createMetaObject(request: any) {
     const { admin } = await authenticate.admin(request);
-
+    const metaobjectType = `app_${process.env.APP_ID}_wishlist_1`;
     console.log("Entered into createMetaobject");
 
     const response = await admin.graphql(
@@ -186,8 +187,8 @@ export class MetaobjectService {
       {
         variables: {
           "metaobject": {
-            "type": `app--${process.env.APP_ID}--spin-wheel-840`,
-            "handle": "spin-wheel-popup-new-app-owned",
+            "type": metaobjectType,
+            "handle": "wishlist-ai",
             "fields": [
               {
                 "key": "settings",
@@ -242,80 +243,6 @@ export class MetaobjectService {
 
     console.log("Metaobject saved:", data.data.metaobject);
     return data.data.metaobject;
-  }
-
-  async updateMetaObject(request: any, metaobjectId: any, key: any, popupData: any) {
-    const { admin } = await authenticate.admin(request);
-
-    const response = await admin.graphql(
-      `#graphql
-  mutation UpdateMetaobject($id: ID!, $metaobject: MetaobjectUpdateInput!) {
-    metaobjectUpdate(id: $id, metaobject: $metaobject) {
-      metaobject {
-        handle
-        type
-        field(key: "${key}") {
-          value
-        }
-      }
-      userErrors {
-        field
-        message
-        code
-      }
-    }
-  }`,
-      {
-        variables: {
-          "id": metaobjectId,
-          "metaobject": {
-            "fields": [
-              {
-                "key": key,
-                "value": typeof popupData === "string" ? popupData : JSON.stringify(popupData)
-              }
-            ]
-          }
-        },
-      },
-    );
-
-    const data = await response.json();
-
-    if (data?.data?.metaobjectUpdate?.userErrors?.length) {
-      console.error("User Errors from updateMetaObject:", data.data.metaobjectUpdate.userErrors);
-    }
-
-    console.log("Metaobject saved:", data.data.metaobjectUpdate.metaobject);
-    return data.data.metaobjectUpdate.metaobject
-
-  }
-
-  async deleteMetaObject(request: any, metaobjectId: string) {
-    const { admin } = await authenticate.admin(request);
-    const response = await admin.graphql(
-      `#graphql
-      mutation DeleteMetaobject($id: ID!) {
-        metaobjectDelete(id: $id) {
-          deletedId
-          userErrors {
-            field
-            message
-            code
-          }
-        }
-      }`,
-      {
-        variables: {
-          id: metaobjectId,
-        },
-      },
-    );
-    const data = await response.json();
-    if (data?.data?.metaobjectDelete?.userErrors?.length) {
-      console.error("User Errors from deleteMetaObject:", data.data.metaobjectDelete.userErrors);
-    }
-    return data.data.metaobjectDelete;
   }
 
 

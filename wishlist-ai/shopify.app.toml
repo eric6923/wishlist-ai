@@ -3,7 +3,7 @@
 client_id = "f679b0298212fa4b9f5fe48556444ddb"
 name = "wishlist-ai"
 handle = "wishlist-ai"
-application_url = "https://nicholas-jackson-meal-greensboro.trycloudflare.com"
+application_url = "https://environments-spas-tue-draws.trycloudflare.com"
 embedded = true
 
 [build]
@@ -24,13 +24,13 @@ scopes = "read_themes,write_app_proxy,write_customers,write_discounts,write_meta
 
 [auth]
 redirect_urls = [
-  "https://nicholas-jackson-meal-greensboro.trycloudflare.com/auth/callback",
-  "https://nicholas-jackson-meal-greensboro.trycloudflare.com/auth/shopify/callback",
-  "https://nicholas-jackson-meal-greensboro.trycloudflare.com/api/auth/callback"
+  "https://environments-spas-tue-draws.trycloudflare.com/auth/callback",
+  "https://environments-spas-tue-draws.trycloudflare.com/auth/shopify/callback",
+  "https://environments-spas-tue-draws.trycloudflare.com/api/auth/callback"
 ]
 
 [app_proxy]
-url = "https://nicholas-jackson-meal-greensboro.trycloudflare.com/app/discount"
+url = "https://environments-spas-tue-draws.trycloudflare.com/app/discount"
 subpath = "discount"
 prefix = "apps"
 
